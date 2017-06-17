@@ -1,0 +1,267 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+	<meta charset="utf-8" />
+</head>
+<body>
+   <b> Products WEBAPI interface and involking list:</b>
+    <br>
+    <br>
+    <b>1. Get all products:</b><br><a id="a1" href=""  target="_blank"></a> 
+    <br>
+    <b>2. Get all products matching the specified name:</b><br> <a  id="a2" href=""  target="_blank"></a> 
+    <br>
+    <b>3. Get the project that matches the specified ID:</b> <br><a  id="a3" href="" target="_blank"></a>
+    <br>
+    <form id="newproduct"  method="post" action="/api/products" enctype="application/x-www-form-urlencoded" >
+      
+        <b> 4. Post a new product and save it to database.</b>
+        <table>
+           
+            <tr>
+                <td><label for="txtname">Name：</label></td>
+                <td><input type="text"  name="Name" id="Productname"/></td>
+            </tr>
+            <tr>
+                <td><label for="txtpswd">Description：</label></td>
+                <td><input type="text"  name="Description" id="ProductDescription" /></td>
+            </tr>
+            <tr>
+                <td><label for="txtpswd">Price：</label></td>
+                <td><input type="number"  name="Price" id="ProductPrice"/></td>
+            </tr>
+            <tr>
+                <td><label for="txtpswd">DeliveryPrice：</label></td>
+                <td><input type="number" name="DeliveryPrice" id="ProductDeliveryPrice"/></td>
+            </tr>
+            
+            <tr>
+                <td colspan=2>
+                    <input type="reset" />
+                    <input type="button" id="SaveItbyAjax" value="SaveItbyAjax"  />
+                    <input type="submit" value="SavebyForm"   />                 
+                </td>
+            </tr>
+        </table> 
+        <b> 5. Put a product to update:</b>        
+        <label for="txtname">ID</label> 
+        <input type="text"  style="background-color:gray" size="30"  readonly="readonly" width="100%" name="Id" id="PRODUCTID" value="8f2e9176-35ee-4f0a-ae55-83023d2db1a3" />
+        <input type="button" id="FindProductByID" value="Refresh">   
+        Edit the product info above and then click->
+        <input type="button" id="UpdateitbyAjax" value="UpdateitbyAjax" />
+        <br>
+        <b> 6. Delete a product and its options:</b>
+        <label for="txtname">ID</label>
+        <input type="text"  size="30" name="Id" id="DeletePropductID" value="" />        
+        <input type="button" id="FindProductToDelete" value="Refresh"> 
+        <input type="button" id="DeleteitbyAjax" value="DeleteitbyAjax" />
+    </form>
+    <b> 7. Get all options for a specified product:</b><br>
+    <a id="a7" href="" target="_blank"></a><br>
+    <b> 8. Get the specified product option for the specified product:</b><br>
+    <a id="a8" href="" target="_blank"></a>
+    <br>
+    <label><b> 9. Post a new product option to the specified product:</b> </label><br> 
+    <label>ProductID:</label> <input type="text"size="30" id="AProductID" value="8F2E9176-35EE-4F0A-AE55-83023D2DB1A3" />
+    <label>NAME:</label><input type="text" id="OPTIONName" value=""/>
+    <label>DESCRIPTION:</label> <input type="text" id="OPTIONDescription" value="" />
+    <input type="button" id="SaveAOption" value="SaveAProductOption" />
+    <br>
+
+    <b> 10. Put a specified product option to update:</b><br>
+    <label for="txtname">ProductID</label>
+    <input type="text" style="background-color:gray" size="30" readonly="readonly" width="100%" name="Id" id="PID" value="8f2e9176-35ee-4f0a-ae55-83023d2db1a3" />
+    <label for="txtname">ID</label>
+    <input type="text" style="background-color:gray" size="30" readonly="readonly" width="100%" name="Id" id="PRODUCTOPTIONID" value="0643CCF0-AB00-4862-B3C5-40E2731ABCC9" />
+    <input type="button" id="RefreshProductOptionByID" value="Refresh">
+    <br><label>OPTION-NAME:</label><input type="text" id="OPTION_Name" value="" />
+    <label>OPTION-DESCRIPTION:</label> <input type="text" id="OPTION_Description" value="" />
+    <br>
+    Edit the product info above and then click->
+    <input type="button" id="UpdateOptionbyAjax" value="UpdateitbyAjax" />
+    <br>
+    <b> 11. Delete the specified product option(click 7 to show all options and try to delete one option of them):</b><br> 
+    ProductId:<input type="text" id="p_id" size="30"  >
+    ProductOptionId:<input type="text" id="op_id" size="30"  >
+    <input type="button" id="DeleteProductOption" value="DeleteitProductOptionAjax" />
+    <br><br><br>
+        <b>Explaination</b><br>
+       1.  Create a DAL class to be in charge of all based operation of data accessing.<br>
+       2.  DAL->Products->ProductsController, it is a typical structure.<br>
+           <label style="font-style:italic;color:lightseagreen">DAL: General data accessing and operating class.</label><br>
+    <label style="font-style:italic;color:lightseagreen"> Products: Business logic operationg class related to products which uses the DAL instance to access database.</label><br>
+    <label style="font-style:italic;color:lightseagreen"> ProductsController: Webapi handle class which only invokes the business logic class.</label> <br>
+    <label style="font-style:italic;color:lightseagreen">
+       <b> The Strength:</b> DAL separates the database accessing from business logic handling that bring flexible to change database accessing technique like using Untity Framework for futural requirement.
+        <br> Product class separates from webapi interface class brings us clear and neat codes and decoupled themselves. The decoupling makes it is possible that 2 coders separately coding webapi and products business logic at the same time. 
+    </label> <br>
+        3.  Modify SQL query to avoid SQL Injection attacking.<br><label style="font-style:italic;color:lightseagreen">
+    Here only used SQL parameter to achieve it, according to this is a webapi that should not be too flexible for a data query interface.<br></label>
+   4. The Getall products interface is not actually proper. That should change to a paging data webapi interface to reduce the server load.   <br>5. There should be an authentication mechanism in the webapi that makes a public webapi more safe. The authentication mechanism decides which user role is able to use a certain webapi interface. 
+
+    <script src="http://libs.baidu.com/jquery/1.7.2/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#a1').attr('href', "http://" + window.location.hostname + ":" + window.document.location.port + '/api/products');
+            $('#a1').text("http://" + window.location.hostname + ":" + window.document.location.port + '/api/products');
+            $('#a2').attr('href', "http://" + window.location.hostname + ":" + window.document.location.port + '/api/products?name=Apple%20iPhone%206S');
+            $('#a2').text("http://" + window.location.hostname + ":" + window.document.location.port + '/api/products?name=Apple%20iPhone%206S');
+            $('#a3').attr('href', "http://" + window.location.hostname + ":" + window.document.location.port + '/api/products/{8f2e9176-35ee-4f0a-ae55-83023d2db1a3}');
+            $('#a3').text("http://" + window.location.hostname + ":" + window.document.location.port + '/api/products/{8f2e9176-35ee-4f0a-ae55-83023d2db1a3}');
+            $('#a7').attr('href', "http://" + window.location.hostname + ":" + window.document.location.port + '/api/products/{8f2e9176-35ee-4f0a-ae55-83023d2db1a3}/options');
+            $('#a7').text("http://" + window.location.hostname + ":" + window.document.location.port + '/api/products/{8f2e9176-35ee-4f0a-ae55-83023d2db1a3}/options');
+            $('#a8').attr('href', "http://" + window.location.hostname + ":" + window.document.location.port + '/api/products/{8f2e9176-35ee-4f0a-ae55-83023d2db1a3}/options/{0643ccf0-ab00-4862-b3c5-40e2731abcc9}');
+            $('#a8').text("http://" + window.location.hostname + ":" + window.document.location.port + '/api/products/{8f2e9176-35ee-4f0a-ae55-83023d2db1a3}/options/{0643ccf0-ab00-4862-b3c5-40e2731abcc9}');
+
+            $('#SaveItbyAjax').click(function () {
+                $.post('api/products', $('#newproduct').serialize())
+               .success(function (res) {
+                   alert("You have inserted " + res + " new product.");
+               })
+               .error(function () {
+                   $('#message').html("Error posting the update.");
+               });
+                return false;
+            });
+
+            $('#FindProductToDelete').click(function () {
+                var id = "{" + $('#DeletePropductID').val() + "}";
+                $.get('api/products/' + id, null)
+               .success(function (data) {
+                   $('#Productname').attr('value', data.Name);
+                   $('#ProductDescription').attr('value', data.Description);
+                   $('#ProductPrice').attr('value', data.Price);
+                   $('#ProductDeliveryPrice').attr('value', data.DeliveryPrice);
+               })
+               .error(function () {
+                   $('#message').html("Error refresh the record product.");
+               });
+                return false;
+            });
+
+            $('#FindProductByID').click(function () {
+                var id = "{" + $('#PRODUCTID').val() + "}";
+                $.get('api/products/' + id, null)
+               .success(function (data) {
+                   $('#Productname').attr('value', data.Name);
+                   $('#ProductDescription').attr('value', data.Description);
+                   $('#ProductPrice').attr('value', data.Price);
+                   $('#ProductDeliveryPrice').attr('value', data.DeliveryPrice);
+               })
+               .error(function () {
+                   $('#message').html("Error refresh the product.");
+               });
+                return false;
+            });
+
+            $('#UpdateitbyAjax').click(function () {
+                var id = "{" + $('#PRODUCTID').val() + "}";
+                var product = { Name: $('#Productname').val(), Description: $('#ProductDescription').val(), Price: $('#ProductPrice').val(), DeliveryPrice: $('#ProductDeliveryPrice').val() };
+                $.ajax({
+                    url: "/api/products/" + id,
+                    type: 'PUT',
+                    contentType:
+                       "application/json;charset=utf-8",
+                    data: JSON.stringify(product),
+                    success: function (rec) {
+                        alert("You have succeeded to update " + rec + " records!")
+                    },
+                    error: function (request, message, error) {
+                        handleException(request, message, error);
+                    }
+                });
+                return false;
+            })
+
+            $('#DeleteitbyAjax').click(function () {
+                var id = "{" + $('#DeletePropductID').val() + "}";
+                $.ajax({
+                    url: "/api/products/" + id,
+                    type: 'delete',
+                    contentType:
+                       "application/json;charset=utf-8",
+                    data: null,
+                    success: function (rec) {
+                        alert("You have succeeded to delete the " + rec + " records!")
+                    },
+                    error: function (request, message, error) {
+                        handleException(request, message, error);
+                    }
+                });
+                return false;
+            })
+
+
+            $('#SaveAOption').click(function () {
+                var productid = $('#AProductID').val();
+                var OPTIONName = $('#OPTIONName').val();
+                var OPTIONDescription = $('#OPTIONDescription').val();
+                $.post('api/products/' + productid + '/options', { Id: "", ProductId: productid, Name: OPTIONName, Description: OPTIONDescription })
+                .success(function (res) {
+                    alert("You have inserted 1 new product option.");
+                })
+                .error(function () {
+                    $('#message').html("Error posting the update.");
+                });
+                return false;
+            });
+
+            $('#RefreshProductOptionByID').click(function () {
+                var pid = "{" + $('#PID').val() + "}";
+                var OPTIONID = "{" + $('#PRODUCTOPTIONID').val() + "}";
+                $.get('api/products/' + pid + '/options/' + OPTIONID, null)
+               .success(function (data) {
+                   $('#OPTION_Name').attr('value', data.Name);
+                   $('#OPTION_Description').attr('value', data.Description);
+               })
+               .error(function () {
+                   $('#message').html("Error refresh the product.");
+               });
+                return false;
+            });
+
+            $('#UpdateOptionbyAjax').click(function () {
+                var pid = "{" + $('#PID').val() + "}";
+                var optionid = "{" + $('#PRODUCTOPTIONID').val() + "}";
+                var productoption = { Id: optionid, ProductId: pid, Name: $('#OPTION_Name').val(), Description: $('#OPTION_Description').val() };
+                $.ajax({
+                    url: "/api/products/" + pid + "/options/" + optionid,
+                    type: 'PUT',
+                    contentType:
+                       "application/json;charset=utf-8",
+                    data: JSON.stringify(productoption),
+                    success: function (rec) {
+                        alert("You have succeeded to update " + rec + " records!")
+                    },
+                    error: function (request, message, error) {
+                        handleException(request, message, error);
+                    }
+                });
+                return false;
+            })
+
+            $('#DeleteProductOption').click(function () {
+                var pid = "{" + $('#p_id').val() + "}";
+                var opid = "{" + $('#op_id').val() + "}";
+                $.ajax({
+                    url: "/api/products/" + pid + "/options/" + opid,
+                    type: 'delete',
+                    contentType:
+                       "application/json;charset=utf-8",
+                    data: null,
+                    success: function (rec) {
+                        alert("You have succeeded to delete the " + rec + " records!")
+                    },
+                    error: function (request, message, error) {
+                        handleException(request, message, error);
+                    }
+                });
+                return false;
+
+            })
+        })
+    </script>
+
+</body>
+</html>
