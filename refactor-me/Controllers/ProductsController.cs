@@ -5,6 +5,7 @@ using refactor_me.Models;
 using System.Collections.Generic;
 using System.Web;
 using System.Net.Http.Formatting;
+using Jil;
 
 namespace refactor_me.Controllers
 {
@@ -20,6 +21,18 @@ namespace refactor_me.Controllers
             List < Product > allItems= new List<Product>();
             Products ProductOperator = new Products();
             allItems = ProductOperator.GetAllProducts();
+            return allItems;
+        }
+
+        /*1-paging interface*/
+        [Route("{index}/page/{size}")]
+        // [Authorize(Roles = "Administrators")]
+        [HttpGet] /*invoke code example: http://localhost:58123/api/products/1/page/1  */
+        public List<Product> Products(int index, int size)  //index: page number; size: how many records in one page
+        {
+            List<Product> allItems = new List<Product>();
+            Products ProductOperator = new Products();
+            allItems = ProductOperator.GetAPageProducts(index, size);
             return allItems;
         }
 
@@ -46,7 +59,7 @@ namespace refactor_me.Controllers
             PartItems = ProductOperator.QueryTableByID(id);
             if (PartItems.Count > 0)
             {
-                var product = PartItems[0]; return product;
+                Product product = PartItems[0]; return product;
             }
             else return null;
             //    throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -93,7 +106,7 @@ namespace refactor_me.Controllers
         [HttpDelete]
         public void Delete(Guid id)
         {
-            var product = new Product(id);
+            Product product = new Product(id);
             Products ProductOperator = new Products();
             ProductOperator.DeteteAProduct(id);
         }
@@ -149,7 +162,7 @@ namespace refactor_me.Controllers
         [HttpDelete]
         public void DeleteOption(Guid id)
         {
-            var product = new Product(id);
+            Product product = new Product(id);
             Products ProductOperator = new Products();
             ProductOperator.DeteteAProductOption(id);
         }

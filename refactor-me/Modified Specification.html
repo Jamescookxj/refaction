@@ -5,10 +5,12 @@
 	<meta charset="utf-8" />
 </head>
 <body>
-   <b> Products WEBAPI interface and involking list:</b>
+   
+   <b> Products WEBAPI interface and involking list:</b><br><a id="helpapi" href="" target="_blank"></a>
     <br>
     <br>
-    <b>1. Get all products:</b><br><a id="a1" href=""  target="_blank"></a> 
+    <b>1. Get all products:</b><br><a id="a1" href=""  target="_blank"></a> <br>
+     &nbsp;&nbsp;&nbsp;<b>Get first page of product records (set each page each record)--paging mode to gain data is better than get all once above</b><br><a id="a1-1" href="" target="_blank"></a>
     <br>
     <b>2. Get all products matching the specified name:</b><br> <a  id="a2" href=""  target="_blank"></a> 
     <br>
@@ -76,35 +78,37 @@
     <input type="text" style="background-color:gray" size="30" readonly="readonly" width="100%" name="Id" id="PRODUCTOPTIONID" value="0643CCF0-AB00-4862-B3C5-40E2731ABCC9" />
     <input type="button" id="RefreshProductOptionByID" value="Refresh">
     <br><label>OPTION-NAME:</label><input type="text" id="OPTION_Name" value="" />
-    <label>OPTION-DESCRIPTION:</label> <input type="text" id="OPTION_Description" value="" />
-    <br>
+    <label>OPTION-DESCRIPTION:</label> <input type="text" id="OPTION_Description" value="" /> <br>
     Edit the product info above and then click->
-    <input type="button" id="UpdateOptionbyAjax" value="UpdateitbyAjax" />
-    <br>
+    <input type="button" id="UpdateOptionbyAjax" value="UpdateitbyAjax" /> <br>
     <b> 11. Delete the specified product option(click 7 to show all options and try to delete one option of them):</b><br> 
     ProductId:<input type="text" id="p_id" size="30"  >
     ProductOptionId:<input type="text" id="op_id" size="30"  >
     <input type="button" id="DeleteProductOption" value="DeleteitProductOptionAjax" />
     <br><br><br>
-        <b>Explaination</b><br>
-       1.  Create a DAL class to be in charge of all based operation of data accessing.<br>
-       2.  DAL->Products->ProductsController, it is a typical structure.<br>
-           <label style="font-style:italic;color:lightseagreen">DAL: General data accessing and operating class.</label><br>
+    <b>Explanation</b><br>
+     1.  Create a DAL class to be in charge of all based operation of data accessing.<br>
+     2.  DAL->Products->ProductsController, it is a typical structure.<br>
+    <label style="font-style:italic;color:lightseagreen">DAL: General data accessing and operating class.</label><br>
     <label style="font-style:italic;color:lightseagreen"> Products: Business logic operationg class related to products which uses the DAL instance to access database.</label><br>
     <label style="font-style:italic;color:lightseagreen"> ProductsController: Webapi handle class which only invokes the business logic class.</label> <br>
     <label style="font-style:italic;color:lightseagreen">
-       <b> The Strength:</b> DAL separates the database accessing from business logic handling that bring flexible to change database accessing technique like using Untity Framework for futural requirement.
-        <br> Product class separates from webapi interface class brings us clear and neat codes and decoupled themselves. The decoupling makes it is possible that 2 coders separately coding webapi and products business logic at the same time. 
+    <b> The Strength:</b> DAL separates the database accessing from business logic handling that bring flexible to change database accessing technique like using Untity Framework for futural requirement.
+    <br> Product class separates from webapi interface class brings us clear and neat codes and decoupled themselves. The decoupling makes it is possible that 2 coders separately coding webapi and products business logic at the same time. 
     </label> <br>
-        3.  Modify SQL query to avoid SQL Injection attacking.<br><label style="font-style:italic;color:lightseagreen">
+    3.  Modify SQL query to avoid SQL Injection attacking.<br><label style="font-style:italic;color:lightseagreen">
     Here only used SQL parameter to achieve it, according to this is a webapi that should not be too flexible for a data query interface.<br></label>
-   4. The Getall products interface is not actually proper. That should change to a paging data webapi interface to reduce the server load.   <br>5. There should be an authentication mechanism in the webapi that makes a public webapi more safe. The authentication mechanism decides which user role is able to use a certain webapi interface. 
-
+    4. The Getall products interface is not actually proper. That should change to a paging data webapi interface to reduce the server load.   <br>
+    5. There should be an authentication mechanism in the webapi that makes a public webapi more safe. The authentication mechanism decides which user role is able to use a certain webapi interface. </br>
+    6. JSON Serializer Jil is a better choice to improve the Web API performance if need to gain big data once. <br>
+    7. All 'var' defined variable  have to be replaced with explicit type to define.
     <script src="http://libs.baidu.com/jquery/1.7.2/jquery.min.js"></script>
     <script type="text/javascript">
         $(document).ready(function () {
             $('#a1').attr('href', "http://" + window.location.hostname + ":" + window.document.location.port + '/api/products');
             $('#a1').text("http://" + window.location.hostname + ":" + window.document.location.port + '/api/products');
+            $('#a1-1').attr('href', "http://" + window.location.hostname + ":" + window.document.location.port + '/api/products/1/page/1');
+            $('#a1-1').text("http://" + window.location.hostname + ":" + window.document.location.port + '/api/products/1/page/1');
             $('#a2').attr('href', "http://" + window.location.hostname + ":" + window.document.location.port + '/api/products?name=Apple%20iPhone%206S');
             $('#a2').text("http://" + window.location.hostname + ":" + window.document.location.port + '/api/products?name=Apple%20iPhone%206S');
             $('#a3').attr('href', "http://" + window.location.hostname + ":" + window.document.location.port + '/api/products/{8f2e9176-35ee-4f0a-ae55-83023d2db1a3}');
@@ -114,6 +118,8 @@
             $('#a8').attr('href', "http://" + window.location.hostname + ":" + window.document.location.port + '/api/products/{8f2e9176-35ee-4f0a-ae55-83023d2db1a3}/options/{0643ccf0-ab00-4862-b3c5-40e2731abcc9}');
             $('#a8').text("http://" + window.location.hostname + ":" + window.document.location.port + '/api/products/{8f2e9176-35ee-4f0a-ae55-83023d2db1a3}/options/{0643ccf0-ab00-4862-b3c5-40e2731abcc9}');
 
+            $('#helpapi').attr('href', "http://" + window.location.hostname + ":" + window.document.location.port + "/help");
+            $('#helpapi').text( "http://" + window.location.hostname + ":" + window.document.location.port + "/help");
             $('#SaveItbyAjax').click(function () {
                 $.post('api/products', $('#newproduct').serialize())
                .success(function (res) {

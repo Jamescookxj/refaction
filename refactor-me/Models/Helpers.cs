@@ -28,6 +28,16 @@ namespace refactor_me.Models
             return new SqlConnection(connstr);
         }
 
+        // Return page records from an identified table
+        public SqlDataReader QueryAPageRecords(string tablename, int index, int size)
+        {
+            var conn = DAL.NewConnection();
+            var cmd = new SqlCommand($"select top "+ size + "* from  (select row_number()over(order by id)rownumber,* from "
+                      + tablename + ") a where rownumber > ("+(index).ToString()+" - 1) * 1 and rownumber < ("+ (index).ToString() + " + 1) * 1", conn);
+            conn.Open();
+            return cmd.ExecuteReader();
+        }
+
         // Return all records from an identified table
         public SqlDataReader QueryAllFromAtable(string tablename)
         {

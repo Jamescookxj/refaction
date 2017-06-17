@@ -29,20 +29,7 @@ namespace refactor_me.Models
             }
             return resultdata;
         }
-        public List<ProductOption> DataReaderToProductOptionList(SqlDataReader datareader)
-        {
-            List<ProductOption> resultdata = new List<ProductOption>();
-            while (datareader.Read())
-            {
-                ProductOption item = new ProductOption();
-                item.ProductId = Guid.Parse(datareader["ProductId"].ToString());
-                item.Id= Guid.Parse(datareader["Id"].ToString());
-                item.Name = datareader["Name"].ToString();
-                item.Description = (DBNull.Value == datareader["Description"]) ? null : datareader["Description"].ToString();               
-                resultdata.Add(item);
-            }
-            return resultdata;
-        }
+    
 
         //2. Get all product records
         public List<Product> GetAllProducts()
@@ -54,7 +41,17 @@ namespace refactor_me.Models
             return resultdata;
         }
 
-        //3. Query particular data with 'name' field's value  
+        //3. Get a page of  product records [index: page number; size: how many records in one page]
+        public List<Product> GetAPageProducts(int index, int size)
+        {
+            DAL dal = new DAL();
+            SqlDataReader datareader = dal.QueryAPageRecords("product",1,1);
+            List<Product> resultdata = new List<Product>();
+            resultdata = DataReaderToProductLsit(datareader);
+            return resultdata;
+        }
+
+        //4. Query particular data with 'name' field's value  
         public List<Product> GetProductsByName(string name)
         {
             DAL dal = new DAL();
@@ -64,7 +61,7 @@ namespace refactor_me.Models
             return resultdata;
         }
 
-        //4. Query particular data with id value  
+        //5. Query particular data with id value  
         public List<Product> QueryTableByID(Guid idvalue)
         {
             DAL dal = new DAL();
@@ -74,7 +71,7 @@ namespace refactor_me.Models
             return resultdata;
         }
 
-        //5. Insert a new product
+        //6. Insert a new product
         public int InsertNewProduct(Product product)
         {
             DAL dal = new DAL();
@@ -89,7 +86,7 @@ namespace refactor_me.Models
             return res;
         }
 
-        //6. Update a new product
+        //7. Update a new product
         public int UpdateProduct(Product product)
         {
             DAL dal = new DAL();
@@ -104,7 +101,7 @@ namespace refactor_me.Models
             return res;
         }
 
-        //7. Delete a product
+        //8. Delete a product
         public int DeteteAProduct(Guid id)
         {
             DAL dal = new DAL();            
@@ -116,7 +113,7 @@ namespace refactor_me.Models
             return res;
         }
 
-        //8. Return all options of  a product with product id
+        //9. Return all options of  a product with product id
         public List<ProductOption> ReturnProductOptions(Guid productId)
         {
             DAL dal = new DAL();
@@ -126,7 +123,7 @@ namespace refactor_me.Models
             return resultdata;
         }
 
-        //9. Finds the specified product option for the specified product
+        //10. Finds the specified product option for the specified product
         public ProductOption ReturnProductOptionById(Guid productId, Guid id)
         {
             DAL dal = new DAL();
@@ -143,7 +140,7 @@ namespace refactor_me.Models
             return null;
         }
 
-        //10. Add a new product option
+        //11. Add a new product option
         public int InsertNewProductOption(ProductOption productoption)
         {
             DAL dal = new DAL();
@@ -158,7 +155,7 @@ namespace refactor_me.Models
             return res;
         }
 
-        //11. Update a new product option
+        //12. Update a new product option
         public int UpdateProductOption(ProductOption option)
         {
             DAL dal = new DAL();
@@ -173,7 +170,7 @@ namespace refactor_me.Models
             return res;
         }
 
-        //12. Delete a product option
+        //13. Delete a product option
         public int DeteteAProductOption(Guid id)
         {
             DAL dal = new DAL();
@@ -182,6 +179,22 @@ namespace refactor_me.Models
             myDic.Add("lower(Id)=", "'"+id.ToString().ToLower().Trim()+"'");
             res= dal.DeleteRecords("productoption", myDic);            
             return res;
+        }
+
+        //14. Generate product option list from a DataReader.
+        public List<ProductOption> DataReaderToProductOptionList(SqlDataReader datareader)
+        {
+            List<ProductOption> resultdata = new List<ProductOption>();
+            while (datareader.Read())
+            {
+                ProductOption item = new ProductOption();
+                item.ProductId = Guid.Parse(datareader["ProductId"].ToString());
+                item.Id = Guid.Parse(datareader["Id"].ToString());
+                item.Name = datareader["Name"].ToString();
+                item.Description = (DBNull.Value == datareader["Description"]) ? null : datareader["Description"].ToString();
+                resultdata.Add(item);
+            }
+            return resultdata;
         }
     }
 
@@ -213,79 +226,9 @@ namespace refactor_me.Models
 
         public Product(Guid id)
         {
-            IsNew = true;
-            var conn = Helpers.NewConnection();
-            var cmd = new SqlCommand($"select * from product where id = '{id}'", conn);
-            conn.Open();
-
-            var rdr = cmd.ExecuteReader();
-            if (!rdr.Read())
-                return;
-
-            IsNew = false;
-            Id = Guid.Parse(rdr["Id"].ToString());
-            Name = rdr["Name"].ToString();
-            Description = (DBNull.Value == rdr["Description"]) ? null : rdr["Description"].ToString();
-            Price = decimal.Parse(rdr["Price"].ToString());
-            DeliveryPrice = decimal.Parse(rdr["DeliveryPrice"].ToString());
-        }
-
-        public void Save()
-        {
-            var conn = Helpers.NewConnection();
-            var cmd = IsNew ? 
-                new SqlCommand($"insert into product (id, name, description, price, deliveryprice) values ('{Id}', '{Name}', '{Description}', {Price}, {DeliveryPrice})", conn) : 
-                new SqlCommand($"update product set name = '{Name}', description = '{Description}', price = {Price}, deliveryprice = {DeliveryPrice} where id = '{Id}'", conn);
-
-            conn.Open();
-            cmd.ExecuteNonQuery();
-        }
-
-        public void Delete()
-        {
-            foreach (var option in new ProductOptions(Id).Items)
-                option.Delete();
-
-            var conn = Helpers.NewConnection();
-            conn.Open();
-            var cmd = new SqlCommand($"delete from product where id = '{Id}'", conn);
-            cmd.ExecuteNonQuery();
-        }
-    }
-
-    public class ProductOptions
-    {
-        public List<ProductOption> Items { get; private set; }
-
-        public ProductOptions()
-        {
-            LoadProductOptions(null);
-        }
-
-        public ProductOptions(Guid productId)
-        {
-            if (productId.ToString().Trim().Length == 36)
-            {
-                LoadProductOptions($"where productid = '{productId}'");
-            }
            
         }
-
-        private void LoadProductOptions(string where)
-        {
-            Items = new List<ProductOption>();
-            var conn = Helpers.NewConnection();
-            var cmd = new SqlCommand($"select id from productoption {where}", conn);
-            conn.Open();
-
-            var rdr = cmd.ExecuteReader();
-            while (rdr.Read())
-            {
-                var id = Guid.Parse(rdr["id"].ToString());
-                Items.Add(new ProductOption(id));
-            }
-        }
-
+      
 
     }
 
@@ -307,42 +250,6 @@ namespace refactor_me.Models
             Id = Guid.NewGuid();
             IsNew = true;
         }
-
-        public ProductOption(Guid id)
-        {
-            IsNew = true;
-            var conn = Helpers.NewConnection();
-            var cmd = new SqlCommand($"select * from productoption where id = '{id}'", conn);
-            conn.Open();
-
-            var rdr = cmd.ExecuteReader();
-            if (!rdr.Read())
-                return;
-
-            IsNew = false;
-            Id = Guid.Parse(rdr["Id"].ToString());
-            ProductId = Guid.Parse(rdr["ProductId"].ToString());
-            Name = rdr["Name"].ToString();
-            Description = (DBNull.Value == rdr["Description"]) ? null : rdr["Description"].ToString();
-        }
-
-        public void Save()
-        {
-            var conn = Helpers.NewConnection();
-            var cmd = IsNew ?
-                new SqlCommand($"insert into productoption (id, productid, name, description) values ('{Id}', '{ProductId}', '{Name}', '{Description}')", conn) :
-                new SqlCommand($"update productoption set name = '{Name}', description = '{Description}' where id = '{Id}'", conn);
-
-            conn.Open();
-            cmd.ExecuteNonQuery();
-        }
-
-        public void Delete()
-        {
-            var conn = Helpers.NewConnection();
-            conn.Open();
-            var cmd = new SqlCommand($"delete from productoption where id = '{Id}'", conn);
-            cmd.ExecuteReader();
-        }
+       
     }
 }
